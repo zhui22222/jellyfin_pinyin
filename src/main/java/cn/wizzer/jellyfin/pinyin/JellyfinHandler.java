@@ -88,34 +88,47 @@ public class JellyfinHandler {
         return nutMap.getList("Items", NutMap.class);
     }
 
-    public void renderItems(List<NutMap> items) {
+    public void renderItems(List<NutMap> items) 
+    {
         List<String> folders = Arrays.asList("Folder", "Season", "CollectionFolder");
         List<String> objects = Arrays.asList("Series", "Movie", "BoxSet", "Audio", "MusicAlbum", "MusicArtist", "Video", "Photo",
                 "Episode");
-        for (NutMap item : items) {
+        for (NutMap item : items) 
+        {
             //log.info(item.getString("Type"));
-            if (folders.contains(item.getString("Type"))) {
+            if (folders.contains(item.getString("Type"))) 
+            {
                 this.renderFolder(item.getString("Id"), item.getString("CollectionType"));
-            } else if (objects.contains(item.getString("Type"))) {
+            } 
+            else if (objects.contains(item.getString("Type"))) 
+            {
                 NutMap itemDetail = JellyfinUtil.getItem(domain, key, userId, item.getString("Id"));
-                if (itemDetail == null) {
+                if (itemDetail == null) 
+                {
                     log.error("服务器出错,请重启Jellyfin");
                     return;
                 }
-                if (skip && Strings.isNotBlank(itemDetail.getString("ForcedSortName"))) {
+                String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
+                if (skip && itemDetail.getString("ForcedSortName").equals(pinyin))
+                {                   
                     log.infof("跳过 %s", itemDetail.getString("Name"));
-                    this.skipCount++;
-                } else {
+                    this.skipCount++;}
+                } 
+                else
+                {
                     log.infof("%s", itemDetail.getString("Name"));
-                    String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
-                    if (Strings.isNotBlank(pinyin) && pinyin.length() > 50) {
+                    //String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
+                    if (Strings.isNotBlank(pinyin) && pinyin.length() > 50) 
+                    {
                         pinyin = pinyin.substring(0, 50);
                     }
                     itemDetail.setv("ForcedSortName", pinyin);
                     JellyfinUtil.postItem(domain, key, item.getString("Id"), itemDetail);
                     this.processCount++;
                 }
-            } else {
+            }
+            else 
+            {
                 log.infof("跳过，未知类型：%s", Json.toJson(item));
                 this.skipCount++;
             }
