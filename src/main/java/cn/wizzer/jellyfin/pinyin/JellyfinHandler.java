@@ -102,12 +102,16 @@ public class JellyfinHandler {
                     log.error("服务器出错,请重启Jellyfin");
                     return;
                 }
-                if (skip && Strings.isNotBlank(itemDetail.getString("ForcedSortName"))) {
+                String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
+                if (skip && itemDetail.getString("ForcedSortName").equals(pinyin))
+                {                   
                     log.infof("跳过 %s", itemDetail.getString("Name"));
-                    this.skipCount++;
-                } else {
+                    this.skipCount++;}
+                } 
+                else
+                {
                     log.infof("%s", itemDetail.getString("Name"));
-                    String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
+                    //String pinyin = PinyinUtil.getPingYin(itemDetail.getString("Name"));
                     if (Strings.isNotBlank(pinyin) && pinyin.length() > 50) {
                         pinyin = pinyin.substring(0, 50);
                     }
